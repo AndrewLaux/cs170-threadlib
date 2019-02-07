@@ -3,6 +3,5 @@
 
 #include <pthread.h>
 
-int two(char b);
 
 #endif
