@@ -35,6 +35,7 @@ namespace {
     const int RUNNING = 1;
     const int READY = 0;
     const int EXITED = 2;
+    const int STACK_MAX = 32676;
 
 
     /*--- Helper function: pthread_exit -----------------------------------------------
@@ -61,7 +62,8 @@ namespace {
         if (running_thrds > 1) throw std::runtime_error("Switcher detected multiple threads with status=RUNNING\n");
 
         //Jump to selected thread.
-        printf("[3]= %x\n[4]= %x\n[5]= %x\n", current_it->second.env[3], current_it->second.env[4],current_it->second.env[5]);
+        printf("Switching to [%i] of %i:\n", current_it->second.id, id_counter);
+        printf("jmp_buf PC set to %x\n", current_it->second.env[5]);
         longjmp(current_it->second.env, 1);
 
         exit(0);
