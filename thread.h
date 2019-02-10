@@ -63,23 +63,24 @@ namespace {
 
         //Jump to selected thread.
         printf("Switching to [%i] of %i:\n", current_it->second.id, id_counter);
-        printf("jmp_buf PC set to %x\n", current_it->second.env[5]);
+        printf("jmp_buf PC set to %x\n", current_it->second.env[0].__jmpbuf[5]);
         longjmp(current_it->second.env, 1);
 
         exit(0);
     }
 
     /*--- Helper Function: pointer mangler --------------------------------------------*/
-    int ptr_mangle(int p) {
-        unsigned int ret;
-        asm(" movl %1, %%eax;\n"
+    static int ptr_mangle(int p) {
+    unsigned int ret;
+    asm(" movl %1, %%eax;\n"
         " xorl %%gs:0x18, %%eax;"
+        " roll $0x9, %%eax;"
         " movl %%eax, %0;"
-        : "=r" (ret)
-        : "r" (p)
-        : "%eax"
-        );
-        return ret;
+    : "=r"(ret)
+    : "r"(p)
+    : "%eax"
+    );
+    return ret;
     }
 
 }
