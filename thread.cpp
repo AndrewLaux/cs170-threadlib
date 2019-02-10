@@ -52,6 +52,7 @@ void *(*start_routine)(void*), void *restric_arg) {
 
 /*--- Definition: pthread_exit ------------------------------------------------*/
 void pthread_exit(void *value_ptr) {
+    printf("Exiting thread [%i]\n", current_it->second.id);
     delete[] current_it->second.stack;
     current_it->second.status = EXITED;
     thread_switch();

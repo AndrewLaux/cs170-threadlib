@@ -45,8 +45,7 @@ namespace {
     void thread_switch() {
 
         //Switch current thread off from running.
-        if(current_it->second.status == RUNNING) 
-            current_it->second.status == READY;
+        if(current_it->second.status == RUNNING) current_it->second.status = READY;
 
         //Find next ready thread.
         do {
