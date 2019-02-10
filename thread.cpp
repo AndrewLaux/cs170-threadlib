@@ -29,16 +29,14 @@ void *(*start_routine)(void*), void *restric_arg) {
 
     //If we are in main thread, create the new thread we want.
     if (made_jmp) {
-	printf("Attempting creation of new thread.\n");
-	thread new_thread;
+	    thread new_thread;
         new_thread.stack = new char[STACK_MAX];
         intptr_t *arg = (intptr_t*)&new_thread.stack[STACK_MAX - 4];
         intptr_t *ret = (intptr_t*)&new_thread.stack[STACK_MAX - 8];
         intptr_t bp = (intptr_t)&new_thread.stack[STACK_MAX - 12];
         *arg = (intptr_t)restric_arg;
         *ret = (intptr_t)pthread_exit;
-	printf("Stack allocated.\n");
-	int i = setjmp(new_thread.env);
+	    int i = setjmp(new_thread.env);
         new_thread.env[0].__jmpbuf[3] = ptr_mangle(bp);
         new_thread.env[0].__jmpbuf[4] = ptr_mangle(bp);
         new_thread.env[0].__jmpbuf[5] = ptr_mangle((intptr_t)start_routine);
@@ -52,6 +50,15 @@ void *(*start_routine)(void*), void *restric_arg) {
     return 0;
 }
 
+/*--- Definition: pthread_exit ------------------------------------------------*/
+void pthread_exit(void *value_ptr) {
+    delete[] current_it->second.stack;
+    current_it->second.status = EXITED;
+    thread_switch();
+    exit(0);
+}
 
-
-
+/*--- Definition: pthread_self ------------------------------------------------*/
+pthread_t pthread_self(void) {
+    return current_it->second.id;
+}

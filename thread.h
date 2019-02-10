@@ -38,14 +38,15 @@ namespace {
     const int STACK_MAX = 32676;
 
 
-    /*--- Helper function: pthread_exit -----------------------------------------------
+    /*--- Helper function: pthread_switch -----------------------------------------------
      * This shall schedule the next ready thread from the thread pool to continue
      * execution. Threads are cycled through via 50ms round robin. */
     void thread_switch() __attribute__((noreturn));
     void thread_switch() {
 
-        //Switch current thread to ready.
-        current_it->second.status = READY;
+        //Switch current thread off from running.
+        if(current_it->second.status == RUNNING) 
+            current_it->second.status == READY;
 
         //Find next ready thread.
         do {
@@ -95,7 +96,7 @@ int pthread_create(pthread_t *restrict_thread, const pthread_attr_t *restrict_at
  *  This shall return the ID of the calling thread. */
 pthread_t pthread_self(void);
 
-/*--- Helper function: pthread_exit -------------------------------------------
+/*--- Thread API: pthread_exit -------------------------------------------
  *  This function shall terminate the calling thread and perform cleanup.
  *  This function does not return.*/
 void pthread_exit(void *value_ptr) __attribute__((noreturn));
