@@ -19,4 +19,4 @@ run-4:
 	./4.exe > basic_4_test.out
 
 clean:
-	rm -f *.exe* *.o *test.out
+	rm -f *.exe* *.o *test.out 1 2 3 4

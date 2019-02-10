@@ -32,14 +32,15 @@ void *(*start_routine)(void*), void *restric_arg) {
     //If we are in main thread, create the new thread we want.
     if (made_jmp) {
         new_thread.stack = new char[STACK_MAX];
-        int *arg = (int*)&new_thread.stack[STACK_MAX - 4];
-        int *ret = (int*)&new_thread.stack[STACK_MAX - 8];
-        int bp = (int)&new_thread.stack[STACK_MAX - 12];
-        *arg = (int)restric_arg;
-        *ret = (int)pthread_exit;
-        new_thread.env[3] = (long)ptr_mangle(bp);
-        new_thread.env[4] = (long)ptr_mangle(bp);
-        new_thread.env[5] = (long)ptr_mangle((int)start_routine);
+        intptr_t *arg = (intptr_t*)&new_thread.stack[STACK_MAX - 4];
+        intptr_t *ret = (intptr_t*)&new_thread.stack[STACK_MAX - 8];
+        intptr_t bp = (intptr_t)&new_thread.stack[STACK_MAX - 12];
+        *arg = (intptr_t)restric_arg;
+        *ret = (intptr_t)pthread_exit;
+	int i = setjmp(new_thread.env);
+        //new_thread.env[0].__jmpbuf[3] = ptr_mangle(bp);
+        new_thread.env[0].__jmpbuf[4] = ptr_mangle(bp);
+        new_thread.env[0].__jmpbuf[5] = ptr_mangle((intptr_t)start_routine);
         new_thread.id = id_counter;
         id_counter++;
         new_thread.status = READY;
