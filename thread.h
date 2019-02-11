@@ -40,10 +40,13 @@ namespace {
     const int EXITED = 2;
     const int STACK_MAX = 32676;
 
+    //Prototype functions.
+    void alarm_handler(int signum);
+    void thread_switch() __attribute__((noreturn));
+
     /*--- Helper function: pthread_switch -----------------------------------------------
      * This shall schedule the next ready thread from the thread pool to continue
-     * execution. Threads are cycled through via 50ms round robin. */
-    void thread_switch() __attribute__((noreturn));
+     * execution. Threads are cycled through via 50ms round robin. */   
     void thread_switch() {
 
         //Switch current thread off from running.
