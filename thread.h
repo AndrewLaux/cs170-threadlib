@@ -40,16 +40,6 @@ namespace {
     const int EXITED = 2;
     const int STACK_MAX = 32676;
 
-    //Alarm handler.
-    void alarm_handler(int signum) {
-        ualarm(0,0);
-        int made_jump = setjmp(current_it->second.env);
-        if (!made_jump) thread_switch();
-
-        //else return back to caller.
-    }
-
-
     /*--- Helper function: pthread_switch -----------------------------------------------
      * This shall schedule the next ready thread from the thread pool to continue
      * execution. Threads are cycled through via 50ms round robin. */
@@ -77,7 +67,7 @@ namespace {
         struct sigaction alarm;
         alarm.sa_handler = alarm_handler;
         alarm.flags = SA_NODEFER;
-        sigaction(SIGALRM, alarm, NULL);
+        sigaction(SIGALRM, &alarm, NULL);
         ualarm(50000,0);
 
 
@@ -87,6 +77,15 @@ namespace {
         longjmp(current_it->second.env, 1);
 
         exit(0);
+    }
+
+    //Alarm handler.
+    void alarm_handler(int signum) {
+        ualarm(0,0);
+        int made_jump = setjmp(current_it->second.env);
+        if (!made_jump) thread_switch();
+
+        //else return back to caller.
     }
 
     /*--- Helper Function: pointer mangler --------------------------------------------*/
