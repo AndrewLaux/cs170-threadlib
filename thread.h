@@ -2,6 +2,7 @@
 #define thread_h
 
 #include <stdio.h>
+#include <stdint.h>
 #include <pthread.h>
 #include <setjmp.h>
 #include <map>
