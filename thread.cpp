@@ -29,15 +29,13 @@ void *(*start_routine)(void*), void *restric_arg) {
 
     //If we are in main thread, create the new thread we want.
     if (made_jmp) {
-	    thread new_thread;
+        thread new_thread;
         new_thread.stack = new char[STACK_MAX];
         intptr_t *args = (intptr_t*)&new_thread.stack[STACK_MAX - 4];
         intptr_t *ret = (intptr_t*)&new_thread.stack[STACK_MAX - 8];
         intptr_t sp = (intptr_t)&new_thread.stack[STACK_MAX - 8];
-	*args = (intptr_t)restric_arg;
-	*ret = (intptr_t)pthread_exit;
-	
-	    int i = setjmp(new_thread.env);
+        *args = (intptr_t)restric_arg;
+        *ret = (intptr_t)pthread_exit;
         new_thread.env[0].__jmpbuf[3] = ptr_mangle(0xffff0000);
         new_thread.env[0].__jmpbuf[4] = ptr_mangle(sp);
         new_thread.env[0].__jmpbuf[5] = ptr_mangle((intptr_t)start_routine);

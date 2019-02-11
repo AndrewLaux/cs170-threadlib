@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <signal.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <setjmp.h>
 #include <map>
@@ -38,6 +40,15 @@ namespace {
     const int EXITED = 2;
     const int STACK_MAX = 32676;
 
+    //Alarm handler.
+    void alarm_handler(int signum) {
+        ualarm(0,0);
+        int made_jump = setjmp(current_it->second.env);
+        if (!made_jump) thread_switch();
+
+        //else return back to caller.
+    }
+
 
     /*--- Helper function: pthread_switch -----------------------------------------------
      * This shall schedule the next ready thread from the thread pool to continue
@@ -61,6 +72,14 @@ namespace {
         int running_thrds = 0;
         for (auto& i : pool) if(i.second.status == RUNNING) running_thrds++;
         if (running_thrds > 1) throw std::runtime_error("Switcher detected multiple threads with status=RUNNING\n");
+
+        //Set ready new alarm.
+        struct sigaction alarm;
+        alarm.sa_handler = alarm_handler;
+        alarm.flags = SA_NODEFER;
+        sigaction(SIGALRM, alarm, NULL);
+        ualarm(50000,0);
+
 
         //Jump to selected thread.
         printf("Switching to [%i] of %i:\n", current_it->second.id, id_counter);
