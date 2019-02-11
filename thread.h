@@ -69,7 +69,7 @@ namespace {
         //Set ready new alarm.
         struct sigaction alarm;
         alarm.sa_handler = alarm_handler;
-        alarm.flags = SA_NODEFER;
+        alarm.sa_flags = SA_NODEFER;
         sigaction(SIGALRM, &alarm, NULL);
         ualarm(50000,0);
 
