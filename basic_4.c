@@ -1,16 +1,24 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <math.h>
-#include <sys/select.h>
-struct timeval tv1,tv2;
+#include <string.h>
 
-#define wait(i,j) ({if(j == 0) {tv1.tv_sec = i;tv1.tv_usec=500000;select(0,NULL,NULL,NULL,&tv1);} else {tv2.tv_sec = i;tv2.tv_usec=500000;select(0,NULL,NULL,NULL,&tv2);}})
 
-#define enjoy_party wait(1,0)
-#define cleanup_party wait(2,0)
-#define pass_time wait(1,1)
+void force_sleep(int seconds) {
+	struct timespec initial_spec, remainder_spec;
+	initial_spec.tv_sec = (time_t)seconds;
+	initial_spec.tv_nsec = 0;
+
+	int err = -1;
+	while(err == -1) {
+		err = nanosleep(&initial_spec,&remainder_spec);
+		initial_spec = remainder_spec;
+		memset(&remainder_spec,0,sizeof(remainder_spec));
+	}
+}
+#define enjoy_party force_sleep(1)
+#define cleanup_party force_sleep(2)
+#define pass_time force_sleep(1)
 
 unsigned int thread_1_done = 0;
 unsigned int make_mess = 0;
