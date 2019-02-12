@@ -9,6 +9,7 @@
 #include <setjmp.h>
 #include <map>
 #include <exception>
+#include <cstring>
 
 
 /*---- Struct: thread ---------------------------------------------------------*  
@@ -49,9 +50,6 @@ namespace {
      * execution. Threads are cycled through via 50ms round robin. */   
     void thread_switch() {
 
-	//Stop alarm inside this func.
-	ualarm(0,0);
-
         //Switch current thread off from running.
         if(current_it->second.status == RUNNING) current_it->second.status = READY;
 
@@ -71,6 +69,8 @@ namespace {
 
         //Set ready new alarm.
         struct sigaction alarm;
+	memset(&alarm, 0, sizeof(struct sigaction));
+	sigemptyset(&alarm.sa_mask);
         alarm.sa_handler = alarm_handler;
         alarm.sa_flags = SA_NODEFER;
         sigaction(SIGALRM, &alarm, NULL);
@@ -84,13 +84,9 @@ namespace {
     }
 
     //Alarm handler.
-    void alarm_handler(int signum) {
-        int rem_time = ualarm(0,0);
+    void alarm_handler(int signum) {    
         int made_jump = setjmp(current_it->second.env);
         if (!made_jump) thread_switch();
-
-        //else return back to caller.
-        ualarm(rem_time, 0);
     }
 
     /*--- Helper Function: pointer mangler --------------------------------------------*/
