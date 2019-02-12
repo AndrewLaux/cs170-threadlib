@@ -66,10 +66,7 @@ namespace {
 
         //Validate that there is only one thread running.
         int running_thrds = 0;
-        for (auto& i : pool) {
-		printf("Thread [%i] = %i\n", i.second.id, i.second.status);
-		if(i.second.status == RUNNING) running_thrds++;
-	}
+        for (auto& i : pool) if(i.second.status == RUNNING) running_thrds++;
         if (running_thrds > 1) throw std::runtime_error("Switcher detected multiple threads with status=RUNNING\n");
 
         //Set ready new alarm.
@@ -81,8 +78,6 @@ namespace {
 
 
         //Jump to selected thread.
-        printf("Switching to [%i] of %i:\n", current_it->second.id, id_counter);
-        printf("jmp_buf PC set to %x\n", current_it->second.env[0].__jmpbuf[5]);
         longjmp(current_it->second.env, 1);
 
         exit(0);
@@ -91,7 +86,6 @@ namespace {
     //Alarm handler.
     void alarm_handler(int signum) {
         ualarm(0,0);
-	write(fileno(stdout), "alarm\n", 7);
         int made_jump = setjmp(current_it->second.env);
         if (!made_jump) thread_switch();
 

@@ -3,18 +3,15 @@
 /*--- Definition: pthread_create ------------------------------------------------*/
 int pthread_create( pthread_t *restrict_thread, const pthread_attr_t *restrict_attr, 
 void *(*start_routine)(void*), void *restric_arg) {
-	printf("Entering create\n");
 
 	//Pause alarm for this function.
 	int rem_time = ualarm(0,0);
-
 
     //Hold return valule of setjump for main. Set to indicate we are in main thread.
     int made_jmp = 0;
 
     //Create main thread if one does not exit.
     if (id_counter == 0) {
-	    printf("Making a thread for main execution.\n");
         thread main_thread;
         made_jmp = setjmp(main_thread.env);
 	if(made_jmp) rem_time = ualarm(0,0);
@@ -46,27 +43,19 @@ void *(*start_routine)(void*), void *restric_arg) {
         new_thread.env[0].__jmpbuf[4] = ptr_mangle(sp);
         new_thread.env[0].__jmpbuf[5] = ptr_mangle((intptr_t)start_routine);
         new_thread.id = id_counter;
-	*restrict_thread = id_counter;
+        *restrict_thread = id_counter;
         id_counter++;
         new_thread.status = READY;
         pool.emplace(new_thread.id, new_thread);
-	printf("Adding new thread [%i] to pool.\n", new_thread.id);
-
     }
 
     //Restor paused alarm.
     ualarm(rem_time, 0);
-
-    printf("End of create. rem = %i\n", rem_time);
-    
-
-
     return 0;
 }
 
 /*--- Definition: pthread_exit ------------------------------------------------*/
 void pthread_exit(void *value_ptr) {
-    printf("Exiting thread [%i]\n", current_it->second.id);
     delete[] current_it->second.stack;
     current_it->second.status = EXITED;
     thread_switch();
