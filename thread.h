@@ -49,6 +49,9 @@ namespace {
      * execution. Threads are cycled through via 50ms round robin. */   
     void thread_switch() {
 
+	//Stop alarm inside this func.
+	ualarm(0,0);
+
         //Switch current thread off from running.
         if(current_it->second.status == RUNNING) current_it->second.status = READY;
 
@@ -63,7 +66,10 @@ namespace {
 
         //Validate that there is only one thread running.
         int running_thrds = 0;
-        for (auto& i : pool) if(i.second.status == RUNNING) running_thrds++;
+        for (auto& i : pool) {
+		printf("Thread [%i] = %i\n", i.second.id, i.second.status);
+		if(i.second.status == RUNNING) running_thrds++;
+	}
         if (running_thrds > 1) throw std::runtime_error("Switcher detected multiple threads with status=RUNNING\n");
 
         //Set ready new alarm.
@@ -85,6 +91,7 @@ namespace {
     //Alarm handler.
     void alarm_handler(int signum) {
         ualarm(0,0);
+	write(fileno(stdout), "alarm\n", 7);
         int made_jump = setjmp(current_it->second.env);
         if (!made_jump) thread_switch();
 

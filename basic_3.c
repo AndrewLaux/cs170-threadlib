@@ -22,6 +22,7 @@ void * bbq_party(void *args) {
 	} else {
 		thread_2_done++;
 	}
+	printf("end of bbq\n");
 }
 
 int main() {
