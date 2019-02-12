@@ -4,7 +4,16 @@
 int pthread_create( pthread_t *restrict_thread, const pthread_attr_t *restrict_attr, 
 void *(*start_routine)(void*), void *restric_arg) {
 
-	//Pause alarm for this function.
+    if (id_counter == 0) {
+        struct sigaction alarm;
+        sigemptyset(&alarm.sa_mask);
+        memset(&alarm, 0, sizeof(struct sigaction));
+        alarm.sa_handler = alarm_handler;
+        alarm.sa_flags = SA_NODEFER;
+        sigaction(SIGALRM, &alarm, NULL);
+    }
+
+    //Pause alarm for this function.
 	int rem_time = ualarm(0,0);
 
     //Hold return valule of setjump for main. Set to indicate we are in main thread.

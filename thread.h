@@ -68,12 +68,6 @@ namespace {
         if (running_thrds > 1) throw std::runtime_error("Switcher detected multiple threads with status=RUNNING\n");
 
         //Set ready new alarm.
-        struct sigaction alarm;
-	memset(&alarm, 0, sizeof(struct sigaction));
-	sigemptyset(&alarm.sa_mask);
-        alarm.sa_handler = alarm_handler;
-        alarm.sa_flags = SA_NODEFER;
-        sigaction(SIGALRM, &alarm, NULL);
         ualarm(50000,0);
 
 
