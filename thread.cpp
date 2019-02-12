@@ -4,6 +4,7 @@
 int pthread_create( pthread_t *restrict_thread, const pthread_attr_t *restrict_attr, 
 void *(*start_routine)(void*), void *restric_arg) {
 
+    //Initialize sig action on first create call.
     if (id_counter == 0) {
         struct sigaction alarm;
         sigemptyset(&alarm.sa_mask);
