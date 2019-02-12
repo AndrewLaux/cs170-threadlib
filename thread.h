@@ -85,11 +85,12 @@ namespace {
 
     //Alarm handler.
     void alarm_handler(int signum) {
-        ualarm(0,0);
+        int rem_time = ualarm(0,0);
         int made_jump = setjmp(current_it->second.env);
         if (!made_jump) thread_switch();
 
         //else return back to caller.
+        ualarm(rem_time, 0);
     }
 
     /*--- Helper Function: pointer mangler --------------------------------------------*/
